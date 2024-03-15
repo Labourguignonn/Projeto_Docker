@@ -1,0 +1,104 @@
+version: '3'
+
+services:
+  servidor:
+    image: server:latest
+    networks:
+      rede-server:
+        ipv4_address: 192.168.70.1
+
+  cliente0:
+    image: cliente:latest
+    networks:
+      rede-server:
+        ipv4_address: 192.168.70.2
+      rede-cliente1:
+        ipv4_address: 192.168.70.69
+      rede-cliente5:
+        ipv4_address: 192.168.70.85
+  
+  cliente1:
+    image: cliente:latest
+    networks:
+      rede-server:
+          ipv4_address: 192.168.70.3
+      rede-cliente0: 
+        ipv4_address: 192.168.70.65
+      rede-cliente2:
+        ipv4_address: 192.168.70.73
+        
+  cliente2:
+    image: cliente:latest
+    networks:
+      rede-server:
+        ipv4_address: 192.168.70.4
+      rede-cliente1:
+        ipv4_address: 192.168.70.70
+      rede-cliente3:
+        ipv4_address: 192.168.70.77
+    
+  cliente3:
+    image: cliente:latest
+    networks:
+      rede-server:
+        ipv4_address: 192.168.70.5
+      rede-cliente2:
+        ipv4_address: 192.168.70.74
+      rede-cliente4:
+        ipv4_address: 192.168.70.81
+        
+  cliente4:
+    image: cliente:latest
+    networks: 
+      rede-server:
+        ipv4_address: 192.168.70.6
+      rede-cliente3:
+        ipv4_address: 192.168.70.78
+      rede-cliente5:
+        ipv4_address: 192.168.70.86
+
+  cliente5:
+    image: cliente:latest
+    networks: 
+      rede-server:
+        ipv4_address: 192.168.70.7
+      rede-cliente4:
+        ipv4_address: 192.168.70.82
+      rede-cliente0:
+        ipv4_address: 192.168.70.66
+  
+networks:
+  rede-server:
+    ipam:
+      config:
+        - subnet: 192.168.70.0/26
+
+  rede-cliente0:
+    ipam:
+      config:
+        - subnet: 192.168.70.64/30
+
+  rede-cliente1:
+    ipam:
+      config:
+        - subnet: 192.168.70.68/30
+
+  rede-cliente2:
+    ipam:
+      config:
+        - subnet: 192.168.70.72/30
+
+  rede-cliente3:
+    ipam:
+      config:
+        - subnet: 192.168.70.76/30
+
+  rede-cliente4:
+    ipam:
+      config:
+        - subnet: 192.168.70.80/30
+
+  rede-cliente5:
+    ipam:
+      config:
+        - subnet: 192.168.70.84/30
