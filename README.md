@@ -18,7 +18,7 @@ COMANDOS USADOS:
 
 Rodar os contêineres: 
 ```
-docker-compose app -d
+docker-compose up -d
 ```
 
 Remove todos os contêineres: 
