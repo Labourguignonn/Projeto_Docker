@@ -24,7 +24,7 @@ mSocketServer = socket(AF_INET, SOCK_STREAM)
 print(f'Socket criado ...')
 #Passo 2: Transformando o socket em um socket servidor.
 #Dar Bind significa vincular um socket a um endereço
-mSocketServer.bind(('192.168.70.1',1234))
+mSocketServer.bind(('localhost',1234))
 
 #Colocar o servidor para escutar as solicitações de conexão
 mSocketServer.listen()

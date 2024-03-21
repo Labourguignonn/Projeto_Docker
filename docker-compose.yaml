@@ -1,104 +1,114 @@
-version: '3'
+version: '3.3'
 
 services:
   servidor:
     image: server:latest
+    container_name: server
+    ports:
+      - "1234:1234"    
     networks:
-      rede-server:
-        ipv4_address: 192.168.70.1
+      - rede-server
 
   cliente0:
     image: cliente:latest
+    container_name: cliente0
     networks:
-      rede-server:
-        ipv4_address: 192.168.70.2
-      rede-cliente1:
-        ipv4_address: 192.168.70.69
-      rede-cliente5:
-        ipv4_address: 192.168.70.85
+      - rede-server
+      - rede-cliente0
+      - rede-cliente1
+      - rede-cliente5
   
   cliente1:
     image: cliente:latest
+    container_name: cliente1
     networks:
-      rede-server:
-          ipv4_address: 192.168.70.3
-      rede-cliente0: 
-        ipv4_address: 192.168.70.65
-      rede-cliente2:
-        ipv4_address: 192.168.70.73
+      - rede-server
+      - rede-cliente0
+      - rede-cliente1
+      - rede-cliente2
         
   cliente2:
     image: cliente:latest
+    container_name: cliente2
     networks:
-      rede-server:
-        ipv4_address: 192.168.70.4
-      rede-cliente1:
-        ipv4_address: 192.168.70.70
-      rede-cliente3:
-        ipv4_address: 192.168.70.77
+      - rede-server
+      - rede-cliente1
+      - rede-cliente2
+      - rede-cliente3
     
   cliente3:
     image: cliente:latest
+    container_name: cliente3
     networks:
-      rede-server:
-        ipv4_address: 192.168.70.5
-      rede-cliente2:
-        ipv4_address: 192.168.70.74
-      rede-cliente4:
-        ipv4_address: 192.168.70.81
+      - rede-server
+      - rede-cliente2
+      - rede-cliente3
+      - rede-cliente4
         
   cliente4:
     image: cliente:latest
+    container_name: cliente4
     networks: 
-      rede-server:
-        ipv4_address: 192.168.70.6
-      rede-cliente3:
-        ipv4_address: 192.168.70.78
-      rede-cliente5:
-        ipv4_address: 192.168.70.86
+      - rede-server
+      - rede-cliente3
+      - rede-cliente4
+      - rede-cliente5
 
   cliente5:
     image: cliente:latest
+    container_name: cliente5
     networks: 
-      rede-server:
-        ipv4_address: 192.168.70.7
-      rede-cliente4:
-        ipv4_address: 192.168.70.82
-      rede-cliente0:
-        ipv4_address: 192.168.70.66
-  
+      - rede-server
+      - rede-cliente0
+      - rede-cliente4
+      - rede-cliente5
+        
 networks:
   rede-server:
+    internal: true
+    driver: bridge
     ipam:
       config:
-        - subnet: 192.168.70.0/26
+        - subnet: 192.168.60.0/24
 
   rede-cliente0:
+    internal: true
+    driver: bridge
     ipam:
       config:
-        - subnet: 192.168.70.64/30
+        - subnet: 192.168.70.0/24
 
   rede-cliente1:
+    internal: true
+    driver: bridge
     ipam:
       config:
-        - subnet: 192.168.70.68/30
+        - subnet: 192.168.71.0/24
 
   rede-cliente2:
+    internal: true
+    driver: bridge
     ipam:
       config:
-        - subnet: 192.168.70.72/30
+        - subnet: 192.168.72.0/24
 
   rede-cliente3:
+    internal: true
+    driver: bridge
     ipam:
       config:
-        - subnet: 192.168.70.76/30
+        - subnet: 192.168.73.0/24
 
   rede-cliente4:
+    internal: true
+    driver: bridge
     ipam:
       config:
-        - subnet: 192.168.70.80/30
+        - subnet: 192.168.74.0/24
 
   rede-cliente5:
+    internal: true
+    driver: bridge
     ipam:
       config:
-        - subnet: 192.168.70.84/30
+        - subnet: 192.168.75.0/24

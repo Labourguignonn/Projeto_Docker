@@ -4,26 +4,23 @@ Para rodar as aplicações disponíveis nesse repositório, siga os passos a seg
 ```
 git clone rep
 ```
-
-Abra o terminal e entre na pasta que deseja rodar a aplicação, recomenda-se utilizar o Python3:
-
-```
-Python3 code.py
-```
-
 Lembre-se que, para aplicações cliente-servidor, será necessário utilizar dois terminais, um para o cliente e outro para o servidor.
 
 COMANDOS USADOS:
 
+Remove todos os contêineres: 
+```
+docker rm -f $(docker ps -aq)
+```
+
+Remover todas redes do docker: 
+```
+docker network prune
+```
 
 Rodar os contêineres: 
 ```
 docker-compose up -d
-```
-
-Remove todos os contêineres: 
-```
-docker rm -f $(docker ps -aq)
 ```
 
 Construir a imagem do contêiner do cliente: 
@@ -34,11 +31,6 @@ docker build -t cliente:latest -f Dockerfile.client .
 Construir a imagem do contêiner do servidor: 
 ```
 docker build -t server:latest -f Dockerfile.server .
-```
-
-Remover recursos não utilizados pelo docker: 
-```
-docker system prune
 ```
 
 Lista de todas as redes do docker: 

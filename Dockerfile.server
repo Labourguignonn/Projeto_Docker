@@ -1,10 +1,16 @@
 # Use a imagem base do Ubuntu
 FROM ubuntu:latest
 
+EXPOSE 1234
+
 # Atualize os pacotes do sistema e instale o Python3 e o gerenciador de pacotes pip
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
+    iputils-ping \
+    iptables \
+    traceroute \
+    dnsutils \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -20,5 +26,9 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # Copie a aplicação Python para o diretório de trabalho
 COPY server.py .
 
+# Copie o script de inicialização
+COPY firewall.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/firewall.sh
+RUN /usr/local/bin/firewall.sh
 # Execute a aplicação Python quando o contêiner for iniciado
 CMD ["python3", "server.py"]
