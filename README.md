@@ -45,3 +45,7 @@ Abrir o container específico para rodar:
 ```
 docker exec -it cliente1 /bin/bash
 ```
+
+```
+docker exec -it cliente0 python3 /app/client.py cliente1
+```

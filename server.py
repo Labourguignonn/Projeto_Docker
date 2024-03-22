@@ -1,9 +1,23 @@
+from socket import socket, AF_INET, SOCK_DGRAM
+from threading import Thread
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
-from Crypto.Cipher import AES
-from socket import socket, AF_INET, SOCK_DGRAM
 
-def load_private_key(filename):
+# Dicionário para mapear endereços IP às chaves públicas dos clientes
+client_public_keys = {}
+
+serverPort = 1234
+serverName = 'server'
+
+serverSocket = socket(AF_INET, SOCK_DGRAM)
+serverSocket.bind((serverName, serverPort))
+print('The server is online')
+
+def generate_key_pair():
+    key = RSA.generate(2048)
+    return key
+
+def load_public_key(filename):
     with open(filename, 'rb') as f:
         key = RSA.import_key(f.read())
     return key
@@ -12,60 +26,25 @@ def save_public_key(key, filename):
     with open(filename, 'wb') as f:
         f.write(key.publickey().export_key('PEM'))
 
-def encrypt_rsa(public_key, data):
-    cipher_rsa = PKCS1_OAEP.new(public_key)
-    encrypted_data = cipher_rsa.encrypt(data)
-    return encrypted_data
+def HandleRequestUdp(mserverSocket):
+    # message, clientaddress = serverSocket.recvfrom(2048)
+    message, clientaddress = serverSocket.recvfrom(4096)
+    req = message.decode()
+    print(f'Requisicao recebida de {clientaddress}')
+    print(f'A requisicao foi:{req}')
+    if req =='create':
+        # CRIA A CHAVE, ADICIONA NO DICIONARIO VINCULANDO COM O IP E RETORNA A CHAVE PRIVADA PARA O CLIENTE
+        key = generate_key_pair()
+        private_key = key.export_key()
+        public_key = key.publickey().export_key()
+        rep = private_key
+        # SALVA A CHAVE NO DICIONARIO
+        client_public_keys[clientaddress[0]] = private_key 
+    else:    
+        # FAZ AUTENTICACAO DA CHAVE PUBLICA PASSADA CONSULTANDO O DICIONARIO
+        # ...
+        rep = b'teste'
+    mserverSocket.sendto(rep, clientaddress)
 
-def decrypt_rsa(private_key, encrypted_data):
-    cipher_rsa = PKCS1_OAEP.new(private_key)
-    decrypted_data = cipher_rsa.decrypt(encrypted_data)
-    return decrypted_data
-
-# Step 1: Create socket
-server_socket = socket(AF_INET, SOCK_DGRAM)
-
-# Step 2: Bind socket to address and port
-server_socket.bind(('localhost', 1234))
-
-# Receive client private key
-client_private_key_data, _ = server_socket.recvfrom(4096)
-
-# Load client private key
-client_private_key = load_private_key(client_private_key_data)
-
-# Generate server RSA key pair
-server_rsa_key_pair = RSA.generate(2048)
-
-# Save server public key
-save_public_key(server_rsa_key_pair, 'server_public_key.pem')
-
-# Encrypt server public key with client public key
-server_public_key = server_rsa_key_pair.publickey()
-encrypted_server_public_key = encrypt_rsa(client_private_key, server_public_key.export_key('PEM'))
-
-# Send encrypted server public key to client
-server_socket.sendto(encrypted_server_public_key, _)
-
-# Handling client request
 while True:
-    # Receive encrypted AES key
-    encrypted_aes_key, _ = server_socket.recvfrom(4096)
-
-    # Receive AES parameters
-    nonce = server_socket.recv(16)
-    tag = server_socket.recv(16)
-    ciphertext = server_socket.recv(4096)
-
-    # Decrypt AES key
-    aes_key = decrypt_rsa(client_private_key, encrypted_aes_key)
-
-    # Decrypt data
-    cipher = AES.new(aes_key, AES.MODE_EAX, nonce)
-    decrypted_data = cipher.decrypt_and_verify(ciphertext, tag)
-
-    print(f'Decrypted data: {decrypted_data.decode()}')
-
-    # Respond to client
-    response = "Data received successfully!"
-    server_socket.sendto(response.encode(), _)
+    Thread(target=HandleRequestUdp, args=(serverSocket,)).start()

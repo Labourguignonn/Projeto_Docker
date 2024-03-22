@@ -1,9 +1,12 @@
 version: '3.3'
 
 services:
-  server:
+  server: 
+    environment:
+      - PYTHONUNBUFFERED=1  
     image: server:latest
     container_name: server
+    
     ports:
       - "1234:1234"
     networks:
@@ -86,7 +89,7 @@ networks:
   rede-cliente0:
     internal: true
     driver: bridge
-    ipam:
+    ipam: 
       config:
         - subnet: 192.168.70.0/24
 
