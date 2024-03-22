@@ -37,3 +37,11 @@ Lista de todas as redes do docker:
 ```
 docker network ls
 ```
+Abrir o terminal do containers: 
+```
+ docker rm -f $(docker ps -aq)
+```
+Abrir o container específico para rodar: 
+```
+docker exec -it cliente1 /bin/bash
+```

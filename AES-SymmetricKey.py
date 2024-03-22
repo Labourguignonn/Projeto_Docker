@@ -1,3 +1,5 @@
+#JUNTAR COM O CLIENT.PY
+
 # Hands on 4: Key Generator (Symmetric Key)
 # Este script demonstra como gerar uma chave aleatória, criptografar e descriptografar dados usando o algoritmo AES.
 

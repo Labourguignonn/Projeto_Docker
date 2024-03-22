@@ -1,17 +1,19 @@
 version: '3.3'
 
 services:
-  servidor:
+  server:
     image: server:latest
     container_name: server
     ports:
-      - "1234:1234"    
+      - "1234:1234"
     networks:
       - rede-server
 
   cliente0:
     image: cliente:latest
     container_name: cliente0
+    depends_on:
+      - server    
     networks:
       - rede-server
       - rede-cliente0
@@ -21,6 +23,8 @@ services:
   cliente1:
     image: cliente:latest
     container_name: cliente1
+    depends_on:
+      - server   
     networks:
       - rede-server
       - rede-cliente0
@@ -30,6 +34,8 @@ services:
   cliente2:
     image: cliente:latest
     container_name: cliente2
+    depends_on:
+      - server   
     networks:
       - rede-server
       - rede-cliente1
@@ -39,6 +45,8 @@ services:
   cliente3:
     image: cliente:latest
     container_name: cliente3
+    depends_on:
+      - server   
     networks:
       - rede-server
       - rede-cliente2
@@ -48,6 +56,8 @@ services:
   cliente4:
     image: cliente:latest
     container_name: cliente4
+    depends_on:
+      - server   
     networks: 
       - rede-server
       - rede-cliente3
@@ -57,6 +67,8 @@ services:
   cliente5:
     image: cliente:latest
     container_name: cliente5
+    depends_on:
+      - server   
     networks: 
       - rede-server
       - rede-cliente0

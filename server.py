@@ -1,38 +1,71 @@
-from socket import socket, AF_INET, SOCK_STREAM
-from threading import Thread
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
+from Crypto.Cipher import AES
+from socket import socket, AF_INET, SOCK_DGRAM
 
-def HandleRequest(mClientSocket, mClientAddr):
-    for i in range(4):
-        # Este loop foi criado para que o servidor conseguisse receber diversas requisições de
-        # um mesmo cliente, usando a mesma conexão, ou seja, sem que fosse necessária a
-        # criação de uma nova conexão.
-        print('Esperando o próximo pacote ...')
-        # Recebendo os dados do Cliente:
-        # o Servidor irá receber bytes do cliente, sendo necessária a conversão de bytes
-        # para string ou para o tipo desejado.
-        data = mClientSocket.recv(2048)
-        print(f'Requisição recebida de {mClientAddr}')
-        req = data.decode()
-        print(f'A requisição foi:{req}')
-        # Após receber e processar a requisição o servidor está apto para enviar uma resposta.
-        rep = 'Hey cliente!'
-        mClientSocket.send(rep.encode())
-    mClientSocket.close() 
+def load_private_key(filename):
+    with open(filename, 'rb') as f:
+        key = RSA.import_key(f.read())
+    return key
 
-#Passo 1: Criação do socket
-mSocketServer = socket(AF_INET, SOCK_STREAM)
-print(f'Socket criado ...')
-#Passo 2: Transformando o socket em um socket servidor.
-#Dar Bind significa vincular um socket a um endereço
-mSocketServer.bind(('localhost',1234))
+def save_public_key(key, filename):
+    with open(filename, 'wb') as f:
+        f.write(key.publickey().export_key('PEM'))
 
-#Colocar o servidor para escutar as solicitações de conexão
-mSocketServer.listen()
-for _ in range(10):
-    # Este loop foi colocado para que o servidor conseguisse se conectar com vários cliente;
-    # Passo 3: Colocar o servidor para aceitar as solicitações de conexão:
-    clientSocket, clientAddr =  mSocketServer.accept()
-    print(f'O servidor aceitou a conexão do Cliente: {clientAddr}')
-    # Passo 4: Criação de múltiplas threads para que o servidor consiga responder mais de
-    # um cliente por vez.
-    Thread(target=HandleRequest, args=(clientSocket, clientAddr)).start()
+def encrypt_rsa(public_key, data):
+    cipher_rsa = PKCS1_OAEP.new(public_key)
+    encrypted_data = cipher_rsa.encrypt(data)
+    return encrypted_data
+
+def decrypt_rsa(private_key, encrypted_data):
+    cipher_rsa = PKCS1_OAEP.new(private_key)
+    decrypted_data = cipher_rsa.decrypt(encrypted_data)
+    return decrypted_data
+
+# Step 1: Create socket
+server_socket = socket(AF_INET, SOCK_DGRAM)
+
+# Step 2: Bind socket to address and port
+server_socket.bind(('localhost', 1234))
+
+# Receive client private key
+client_private_key_data, _ = server_socket.recvfrom(4096)
+
+# Load client private key
+client_private_key = load_private_key(client_private_key_data)
+
+# Generate server RSA key pair
+server_rsa_key_pair = RSA.generate(2048)
+
+# Save server public key
+save_public_key(server_rsa_key_pair, 'server_public_key.pem')
+
+# Encrypt server public key with client public key
+server_public_key = server_rsa_key_pair.publickey()
+encrypted_server_public_key = encrypt_rsa(client_private_key, server_public_key.export_key('PEM'))
+
+# Send encrypted server public key to client
+server_socket.sendto(encrypted_server_public_key, _)
+
+# Handling client request
+while True:
+    # Receive encrypted AES key
+    encrypted_aes_key, _ = server_socket.recvfrom(4096)
+
+    # Receive AES parameters
+    nonce = server_socket.recv(16)
+    tag = server_socket.recv(16)
+    ciphertext = server_socket.recv(4096)
+
+    # Decrypt AES key
+    aes_key = decrypt_rsa(client_private_key, encrypted_aes_key)
+
+    # Decrypt data
+    cipher = AES.new(aes_key, AES.MODE_EAX, nonce)
+    decrypted_data = cipher.decrypt_and_verify(ciphertext, tag)
+
+    print(f'Decrypted data: {decrypted_data.decode()}')
+
+    # Respond to client
+    response = "Data received successfully!"
+    server_socket.sendto(response.encode(), _)

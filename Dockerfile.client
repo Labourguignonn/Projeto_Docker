@@ -26,9 +26,5 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # Copie a aplicação Python para o diretório de trabalho
 COPY client.py .
 
-# Copie o script de inicialização
-COPY firewall.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/firewall.sh
-RUN /usr/local/bin/firewall.sh
 # Execute a aplicação Python quando o contêiner for iniciado
 CMD ["python3", "client.py"]

@@ -1,3 +1,6 @@
+#JUNTAR COM O SERVER.PY
+
+
 # Hands on 4: Key Generator (Asymmetric Key)
 # Este script demonstra como gerar uma chave aleatória, criptografar e descriptografar dados usando o algoritmo RSA.
 
