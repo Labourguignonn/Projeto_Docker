@@ -14,7 +14,6 @@ serverAddress = (serverName, port)
 def HandleRequestUdp(mserverSocket):
     message, clientaddress = mClientSocket.recvfrom(8192)
     # DIVIDE A CHAVE DA MENSAGEM
-    # msg     = message[4096:8192]
     # Verifica se a chave é valida na CA
     message = 'auth ' + clientaddress
     mClientSocket.sendto(message.encode(), serverAddress)

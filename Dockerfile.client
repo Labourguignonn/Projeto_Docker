@@ -22,8 +22,6 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Copie a aplicação Python para o diretório de trabalho
 COPY client.py .
-COPY loop.py .
 
 # Execute a aplicação Python quando o contêiner for iniciado
-# CMD ["python3", "loop.py"]
 CMD ["python3", "client.py", "start"]
