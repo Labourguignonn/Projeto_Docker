@@ -32,6 +32,7 @@ def HandleRequestUdp(mserverSocket):
     req = message.decode()
     print(f'Requisicao recebida de {clientaddress}')
     print(f'A requisicao foi:{req}')
+    partes = req.split()
     if req =='create':
         # CRIA A CHAVE, ADICIONA NO DICIONARIO VINCULANDO COM O IP E RETORNA A CHAVE PRIVADA PARA O CLIENTE
         key = generate_key_pair()
@@ -39,11 +40,21 @@ def HandleRequestUdp(mserverSocket):
         public_key = key.publickey().export_key()
         rep = private_key
         # SALVA A CHAVE NO DICIONARIO
-        client_public_keys[clientaddress[0]] = private_key 
+        client_public_keys[clientaddress[0]] = private_key
+    elif (partes[0] == 'auth'):
+        if partes[1] not in client_public_keys:
+            rep = b'Chave publica nao encontrada'
+        else:
+            # SE A CHAVE PUBLICA EXISTIR, RETORNA A CHAVE PUBLICA DO CLIENTE
+            rep = client_public_keys[clientaddress[0]]        
     else:    
         # FAZ AUTENTICACAO DA CHAVE PUBLICA PASSADA CONSULTANDO O DICIONARIO
-        # ...
-        rep = b'teste'
+        # SE A CHAVE PUBLICA NAO EXISTIR NO DICIONARIO, RETORNA ERRO
+        if clientaddress[0] not in client_public_keys:
+            rep = b'Chave publica nao encontrada'
+        else:
+            # SE A CHAVE PUBLICA EXISTIR, RETORNA A CHAVE PUBLICA DO CLIENTE
+            rep = client_public_keys[clientaddress[0]]
     mserverSocket.sendto(rep, clientaddress)
 
 while True:
